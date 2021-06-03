@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://bootswatch.com/5/simplex/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+    <title>Tüm Kullanıcılar</title>
+  </head>
+  <body>
+    <br />
+    <br />
+    <h1 class="text-center">Tüm Kullanıcıların Listesi</h1>
+    <br />
+    <br />
+    <table id="userTable" class="table table-bordered text-center">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Kullanıcı Adı</th>
+          <th>E-posta Adresi</th>
+          <th>Ülke</th>
+          <th>İşlemler</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </body>
+  <script>
+    const USER_URL = 'http://localhost:8080/Odev6/rest/users';
+    $(document).ready(() => {
+      $.get(USER_URL, (data) => {
+        const table = document.getElementById('userTable');
+
+        for (let i = 0; i < data.length; i++) {
+          const row = document.createElement('tr');
+          const id = document.createElement('td');
+          const name = document.createElement('td');
+          const email = document.createElement('td');
+          const country = document.createElement('td');
+          const update = document.createElement('button');
+          const del = document.createElement('button');
+
+          id.innerHTML = data[i].id;
+          name.innerHTML = data[i].name;
+          email.innerHTML = data[i].email;
+          country.innerHTML = data[i].country;
+
+          update.innerHTML = 'Güncelle';
+          del.innerHTML = 'Sil';
+
+          update.classList.add('btn');
+          update.classList.add('btn-link');
+          update.classList.add('me-3');
+          update.classList.add('updateButton');
+          del.classList.add('btn');
+          del.classList.add('btn-link');
+          del.classList.add('deleteButton');
+
+          row.appendChild(id);
+          row.appendChild(name);
+          row.appendChild(email);
+          row.appendChild(country);
+          row.appendChild(update);
+          row.appendChild(del);
+
+          table.appendChild(row);
+        }
+
+        $('.updateButton').click((event) => {
+          event.preventDefault();
+          const row = event.target.parentNode;
+          const data = {
+            id: row.childNodes[0].innerHTML,
+            name: row.childNodes[1].innerHTML,
+            email: row.childNodes[2].innerHTML,
+            country: row.childNodes[3].innerHTML,
+          };
+          localStorage.setItem('id', data.id);
+          localStorage.setItem('name', data.name);
+          localStorage.setItem('email', data.email);
+          localStorage.setItem('country', data.country);
+
+          location = '/updateform.html';
+        });
+
+        $('.deleteButton').click((event) => {
+          event.preventDefault();
+          const row = event.target.parentNode;
+          const id = row.childNodes[0].innerHTML;
+          $.ajax({
+            type: 'DELETE',
+            url: USER_URL + `/${id}`,
+            success: () => {
+              alert('Başarıyla Silindi...');
+              location.reload();
+            },
+            error: () => {
+              alert('Hata!!');
+            },
+          });
+        });
+      });
+    });
+  </script>
+</html>
